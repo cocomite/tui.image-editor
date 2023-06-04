@@ -1,5 +1,5 @@
-// Type definitions for TOAST UI Image Editor v3.15.2
-// TypeScript Version: 3.2.2
+// Type definitions for TOAST UI Image Editor v3.15.3
+// TypeScript Version: 5.1.3
 
 declare namespace tuiImageEditor {
   type AngleType = number;

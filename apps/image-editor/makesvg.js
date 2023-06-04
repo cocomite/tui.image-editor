@@ -1,6 +1,6 @@
 /* eslint-disable */
 const fs = require('fs');
-const mkdirp = require('mkdirp');
+const { mkdirp } = require('mkdirp');
 const svgstore = require('svgstore');
 const svgDir = './src/svg';
 
