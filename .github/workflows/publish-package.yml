@@ -14,5 +14,5 @@ jobs:
           node-version: 18.x
           cache: npm
           registry-url: https://npm.pkg.github.com
-          scope: @cocomite
+          scope: '@cocomite'
       - run: npm ci
