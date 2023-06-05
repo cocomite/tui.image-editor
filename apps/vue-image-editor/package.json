@@ -30,5 +30,8 @@
   "dependencies": {
     "fabric": "^5.3.0",
     "tui-image-editor": "^3.15.2"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
   }
 }

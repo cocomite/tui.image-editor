@@ -48,5 +48,8 @@
     "fabric": "^5.3.0",
     "tui-code-snippet": "^2.3.3",
     "tui-color-picker": "^2.2.6"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
   }
 }
