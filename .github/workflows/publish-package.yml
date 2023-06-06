@@ -13,7 +13,7 @@ jobs:
           registry-url: https://npm.pkg.github.com
           scope: '@cocomite'
       - run: npm install
-      - run: npm install && rm package-lock.json
+      - run: npm install
         working-directory: ./apps/image-editor
       - run: npm run build
         working-directory: ./apps/image-editor
