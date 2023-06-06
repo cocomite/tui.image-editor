@@ -1,9 +1,6 @@
 name: Publish GitHub Packages
 on: [workflow_dispatch]
 
-env:
-  BUILD_CACHE_KEY: ${{ github.sha }}
-
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -15,4 +12,12 @@ jobs:
           cache: npm
           registry-url: https://npm.pkg.github.com
           scope: '@cocomite'
-      - run: npm ci
+      - run: npm install
+      - run: npm install && rm package-lock.json
+        working-directory: ./apps/image-editor
+      - run: npm run build
+        working-directory: ./apps/image-editor
+      - run: npm publish
+        working-directory: ./apps/image-editor
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
