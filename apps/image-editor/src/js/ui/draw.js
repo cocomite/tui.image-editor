@@ -126,8 +126,8 @@ class Draw extends Submenu {
    * Executed when the menu starts.
    */
   changeStartMode() {
-    this.type = 'free';
-    this._els.lineSelectButton.classList.add('free');
+    this.type = 'line';
+    this._els.lineSelectButton.classList.add('line');
     this.setDrawMode();
   }
 
