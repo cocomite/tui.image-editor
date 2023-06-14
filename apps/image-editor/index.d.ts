@@ -1,5 +1,6 @@
 // Type definitions for TOAST UI Image Editor v3.15.3
 // TypeScript Version: 5.1.3
+import { fabric } from 'fabric';
 
 declare namespace tuiImageEditor {
   type AngleType = number;
