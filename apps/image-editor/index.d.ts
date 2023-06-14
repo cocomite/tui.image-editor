@@ -292,6 +292,7 @@ declare namespace tuiImageEditor {
     public discardSelection(): void;
     public flipX(): Promise<IFlipXYResolveObject>;
     public flipY(): Promise<IFlipXYResolveObject>;
+    public getCanvas(): fabric.Canvas
     public getCanvasSize(): ICanvasSize;
     public getCropzoneRect(): IRectConfig;
     public getDrawingMode(): string;
@@ -301,6 +302,7 @@ declare namespace tuiImageEditor {
       id: number,
       keys: string | string[] | IGraphicObjectProps
     ): IGraphicObjectProps;
+    public loadCanvas(json: string | Object): void
     public hasFilter(type: string): boolean;
     public isEmptyRedoStack(): boolean;
     public isEmptyUndoStack(): boolean;
