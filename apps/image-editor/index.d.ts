@@ -296,6 +296,7 @@ declare namespace tuiImageEditor {
     public getCanvas(): fabric.Canvas
     public getCanvasSize(): ICanvasSize;
     public getCropzoneRect(): IRectConfig;
+    public getCroppedRect(): IRectConfig;
     public getDrawingMode(): string;
     public getImageName(): string;
     public getObjectPosition(id: number, originX: string, originY: string): ICanvasSize;
