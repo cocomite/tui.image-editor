@@ -180,7 +180,6 @@ class ImageEditor {
     if (options.includeUI) {
       const UIOption = options.includeUI;
       UIOption.usageStatistics = options.usageStatistics;
-
       this.ui = new UI(wrapper, UIOption, this.getActions());
       options = this.ui.setUiDefaultSelectionStyle(options);
     }
@@ -743,6 +742,7 @@ class ImageEditor {
    * Load image from url
    * @param {string} url - File url
    * @param {string} imageName - imageName
+   * @param {Object | undefined} rect - cropped rect
    * @returns {Promise<SizeChange, ErrorMsg>}
    * @example
    * imageEditor.loadImageFromURL('http://url/testImage.png', 'lena').then(result => {
@@ -750,12 +750,12 @@ class ImageEditor {
    *      console.log('new : ' + result.newWidth + ', ' + result.newHeight);
    * });
    */
-  loadImageFromURL(url, imageName) {
+  loadImageFromURL(url, imageName, rect) {
     if (!imageName || !url) {
       return Promise.reject(rejectMessages.invalidParameters);
     }
 
-    return this.execute(commands.LOAD_IMAGE, imageName, url);
+    return this.execute(commands.LOAD_IMAGE, imageName, url, rect);
   }
 
   /**
@@ -829,7 +829,34 @@ class ImageEditor {
       return Promise.reject(rejectMessages.invalidParameters);
     }
 
-    return this.loadImageFromURL(data.url, data.imageName);
+    return this.loadImageFromURL(data.url, data.imageName, rect);
+  }
+
+  /**
+   * Get cropped rect
+   * @returns {Object | null}  {{left: number, top: number, width: number, height: number}} rect
+   */
+  getCroppedRect() {
+    let rect = null;
+    this._invoker._undoStack.forEach((command) => {
+      console.log(command, commands.LOAD_IMAGE, command.args.length);
+      if (command.name !== commands.LOAD_IMAGE) {
+        return;
+      }
+
+      if (command.args.length !== 4) {
+        return;
+      }
+
+      rect = rect || { left: 0, top: 0, width: 0, height: 0 };
+      // eslint-disable-next-line prefer-destructuring
+      const rectArg = command.args[3];
+      rect.left += rectArg.left;
+      rect.top += rectArg.top;
+      rect.width = rectArg.width;
+      rect.height = rectArg.height;
+    });
+    return rect;
   }
 
   /**
