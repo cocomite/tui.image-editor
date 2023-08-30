@@ -330,6 +330,8 @@ declare namespace tuiImageEditor {
     public toDataURL(options?: IToDataURLOptions): string;
     public undo(iterationCount: number): Promise<any>;
     public on(eventName: string, handler: (...args: any[]) => void): void;
+    public lock(): void;
+    public unlock(): void;
   }
 }
 
