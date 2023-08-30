@@ -633,6 +633,14 @@ class ImageEditor {
     }
   }
 
+  lock() {
+    this._invoker.lock();
+  }
+
+  unlock() {
+    this._invoker.unlock();
+  }
+
   /**
    * Invoke command
    * @param {String} commandName - Command name
