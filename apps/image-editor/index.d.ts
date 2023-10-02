@@ -262,18 +262,31 @@ declare namespace tuiImageEditor {
   }
 
   type AddTextCommand = {
+    name: 'addText';
+    args: any[];
   }
 
   type AddIconCommand = {
+    name: 'addIcon';
+    args: any[];
   }
 
   type AddShapeCommand = {
+    name: 'addShape';
+    args: any[];
   }
 
   type AddLineCommand = {
+    name: 'addObject';
+    args: any[];
   }
 
-  type Command = AddTextCommand | AddIconCommand | AddShapeCommand | AddLineCommand
+  type AddCropCommand = {
+    name: 'crop';
+    args: any[];
+  }
+
+  type Command = AddTextCommand | AddIconCommand | AddShapeCommand | AddLineCommand | AddCropCommand
 
   class ImageEditor {
     constructor(wrapper: string | Element, options: IOptions);
