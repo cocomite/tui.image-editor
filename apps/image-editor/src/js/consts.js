@@ -130,6 +130,7 @@ export const commandNames = {
   SET_OBJECT_POSITION: 'setObjectPosition',
   CHANGE_SELECTION: 'changeSelection',
   RESIZE_IMAGE: 'resize',
+  CROP: 'crop',
 };
 
 /**

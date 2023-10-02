@@ -20,6 +20,7 @@ const command = {
     const iconComp = graphics.getComponent(ICON);
 
     return iconComp.add(type, options).then((objectProps) => {
+      this.args[2].id = objectProps.id;
       this.undoData.object = graphics.getObject(objectProps.id);
 
       return objectProps;

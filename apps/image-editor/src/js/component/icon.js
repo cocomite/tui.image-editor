@@ -101,6 +101,10 @@ class Icon extends Component {
    *      @param {string} [options.fill] - Icon foreground color
    *      @param {string} [options.left] - Icon x position
    *      @param {string} [options.top] - Icon y position
+   *      @param {number | undefined} [options.width] - Icon width
+   *      @param {number | undefined} [options.height] - Icon height
+   *      @param {number | undefined} [options.scaleX] - Icon scaleX
+   *      @param {number | undefined} [options.scaleY] - Icon scaleY
    * @returns {Promise}
    */
   add(type, options) {
@@ -195,7 +199,8 @@ class Icon extends Component {
       top,
       fill: this._iconColor,
     }).then(() => {
-      this.fire(events.ADD_OBJECT, this.graphics.createObjectProperties(this._icon));
+      const arg = this.graphics.createObjectProperties(this._icon);
+      this.fire(events.ADD_OBJECT, { ...arg, iconType: this._type });
       canvas.on('mouse:move', this._handlers.mousemove);
       canvas.on('mouse:up', this._handlers.mouseup);
     });

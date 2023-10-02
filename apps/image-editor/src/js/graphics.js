@@ -1236,13 +1236,15 @@ class Graphics {
 
   /**
    * "object:selected" canvas event handler
-   * @param {{selected: fabric.Object, deselected: fabric.Object, e: MouseEvent}} fEvent - Fabric event
+   * @param {{selected: fabric.Object[], e: MouseEvent}} fEvent - Fabric event
    * @private
    */
   _onObjectSelected(fEvent) {
-    const target = fEvent.selected;
+    if (!fEvent.selected.length) {
+      return;
+    }
+    const [target] = fEvent.selected;
     const params = this.createObjectProperties(target);
-
     this.fire(events.OBJECT_ACTIVATED, params);
   }
 
@@ -1278,11 +1280,14 @@ class Graphics {
 
   /**
    * "selction:created" canvas event handler
-   * @param {{selected: fabric.Object, deselected: fabric.Object, e: MouseEvent}} fEvent - Fabric event
+   * @param {{selected: fabric.Object[], e: MouseEvent}} fEvent - Fabric event
    * @private
    */
   _onSelectionCreated(fEvent) {
-    const target = fEvent.selected;
+    if (!fEvent.selected.length) {
+      return;
+    }
+    const [target] = fEvent.selected;
     const params = this.createObjectProperties(target);
 
     this.fire(events.OBJECT_ACTIVATED, params);

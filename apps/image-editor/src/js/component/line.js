@@ -190,6 +190,7 @@ class Line extends Component {
     const { x1, x2, y1, y2 } = this._line;
 
     return extend({}, params, {
+      type: 'line',
       startPosition: {
         x: x1,
         y: y1,
