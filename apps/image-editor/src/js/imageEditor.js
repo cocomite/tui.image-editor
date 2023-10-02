@@ -9,14 +9,28 @@ import action from '@/action';
 import commandFactory from '@/factory/command';
 import Graphics from '@/graphics';
 import { makeSelectionUndoData, makeSelectionUndoDatum } from '@/helper/selectionModifyHelper';
-import { sendHostName, getObjectType } from '@/util';
+import { sendHostName, getObjectType, stamp } from '@/util';
 import {
   eventNames as events,
   commandNames as commands,
   keyCodes,
   rejectMessages,
   OBJ_TYPE,
+  historyNames,
 } from '@/consts';
+import {
+  createAddTextCommand,
+  changeTextStyle,
+  createAddIconCommand,
+  changeIconColor,
+  createAddObjectCommand,
+  removeObject,
+  changeSelection,
+  changeShape,
+  createAddShapeCommand,
+  createCropCommand,
+} from '@/command';
+import ArrowLine from '@/extension/arrowLine';
 
 const {
   MOUSE_DOWN,
@@ -470,9 +484,37 @@ class ImageEditor {
    */
   _pushModifyObjectCommand(obj) {
     const { type } = obj;
-    const props = makeSelectionUndoData(obj, (item) =>
+    let props = makeSelectionUndoData(obj, (item) =>
       makeSelectionUndoDatum(this._graphics.getObjectId(item), item, type === 'activeSelection')
     );
+    props = props.map((prop) => {
+      if (prop.text) {
+        return Object.keys(prop).reduce((obj, key) => {
+          if (
+            [
+              'id',
+              'fill',
+              'fontFamily',
+              'fontSize',
+              'fontStyle',
+              'fontWeight',
+              'left',
+              'top',
+              'width',
+              'height',
+              'styles',
+              'text',
+              'textLines',
+              'underline',
+            ].includes(key)
+          ) {
+            obj[key] = prop[key];
+          }
+          return obj;
+        }, {});
+      }
+      return prop;
+    });
     const command = commandFactory.create(commands.CHANGE_SELECTION, this._graphics, props);
     command.execute(this._graphics, props);
 
@@ -651,7 +693,6 @@ class ImageEditor {
   execute(commandName, ...args) {
     // Inject an Graphics instance as first parameter
     const theArgs = [this._graphics].concat(args);
-
     return this._invoker.execute(commandName, ...theArgs);
   }
 
@@ -847,7 +888,6 @@ class ImageEditor {
   getCroppedRect() {
     let rect = null;
     this._invoker._undoStack.forEach((command) => {
-      console.log(command, commands.LOAD_IMAGE, command.args.length);
       if (command.name !== commands.LOAD_IMAGE) {
         return;
       }
@@ -1142,6 +1182,60 @@ class ImageEditor {
   }
 
   /**
+   * Add shape
+   * @param {Object} properties - Line properties
+   *   @param {string} [options.stroke]
+   *   @param {number} [options.strokeWidth]
+   *   @param {number} [options.fill]
+   *   @param {number} [options.width]
+   *   @param {number} [options.height]
+   *   @param {number} [options.top]
+   *   @param {number} [options.left]
+   *   @param {number} [options.scaleX]
+   *   @param {number} [options.scaleY]
+   *   @param {number} [options.originX]
+   *   @param {number} [options.originY]
+   *   @param {number} [options.x1]
+   *   @param {number} [options.y1]
+   *   @param {number} [options.x2]
+   *   @param {number} [options.y2]
+   *   @param {number} [options.borderColor]
+   *   @param {number} [options.cornerColor]
+   *   @param {number} [options.cornerSize]
+   *   @param {number} [options.cornerStrokeColor]
+   *   @param {number} [options.cornerStyle]
+   *   @param {number} [options.transparentCorners]
+   * @returns {Promise<ObjectProps, ErrorMsg>}
+   */
+  addLine(properties) {
+    const line = new ArrowLine([properties.x1, properties.y1, properties.x2, properties.y2], {
+      stroke: properties.stroke,
+      strokeWidth: properties.strokeWidth,
+      fill: properties.fill,
+      width: properties.width,
+      height: properties.height,
+      scaleX: properties.scaleX,
+      scaleY: properties.scaleY,
+      originX: properties.originX,
+      originY: properties.originY,
+      top: properties.top,
+      left: properties.left,
+      borderColor: properties.borderColor,
+      cornerColor: properties.cornerColor,
+      cornerSize: properties.cornerSize,
+      cornerStrokeColor: properties.cornerStrokeColor,
+      transparentCorners: properties.transparentCorners,
+      cornerStyle: properties.cornerStyle,
+      arrowType: { head: null, tail: null },
+      evented: false,
+    });
+    this._graphics.add(line);
+    this._graphics.renderAll();
+    line.id = line.__fe_id;
+    this._onAddObject(line);
+  }
+
+  /**
    * Change shape
    * @param {number} id - object id
    * @param {Object} options - Shape options
@@ -1353,6 +1447,10 @@ class ImageEditor {
    */
   _onAddObject(objectProps) {
     const obj = this._graphics.getObject(objectProps.id);
+    obj.type = obj.type || objectProps.type;
+    if (objectProps.iconType) {
+      obj.iconType = objectProps.iconType;
+    }
     this._invoker.fire(events.EXECUTE_COMMAND, getObjectType(obj.type));
     this._pushAddObjectCommand(obj);
   }
@@ -1765,6 +1863,89 @@ class ImageEditor {
    */
   getObjectPosition(id, originX, originY) {
     return this._graphics.getObjectPosition(id, originX, originY);
+  }
+
+  async loadCommands(cmds) {
+    for (let c of cmds) {
+      this.unlock();
+      switch (c.name) {
+        case commands.ADD_TEXT: {
+          await this.addText(...c.args);
+          break;
+        }
+        case commands.ADD_ICON: {
+          const args = [...c.args];
+          delete args[1].id;
+          await this.addIcon(...args);
+          break;
+        }
+        case commands.ADD_SHAPE: {
+          const args = [...c.args];
+          delete args[1].id;
+          await this.addShape(...args);
+          break;
+        }
+        case commands.ADD_OBJECT: {
+          const [arg] = [...c.args];
+          delete arg.id;
+          if (arg.type === 'line') {
+            await this.addLine(arg);
+          }
+          break;
+        }
+        case commands.CROP: {
+          await this.crop(c.args);
+          this._invoker.fire(events.EXECUTE_COMMAND, historyNames.CROP);
+          break;
+        }
+      }
+    }
+  }
+
+  dumpCommands() {
+    let _commands = [];
+    this._invoker._undoStack.forEach((command) => {
+      let args = command.args.slice(1);
+      switch (command.name) {
+        case commands.ADD_TEXT:
+          _commands.push(createAddTextCommand(command, args));
+          return;
+        case commands.CHANGE_TEXT_STYLE:
+          changeTextStyle(_commands, args);
+          return;
+        case commands.ADD_OBJECT:
+          const c = createAddObjectCommand(command, args);
+          if (c) {
+            _commands.push(c);
+          }
+          return;
+        case commands.ADD_ICON:
+          _commands.push(createAddIconCommand(command, args));
+          return;
+        case commands.ADD_SHAPE:
+          _commands.push(createAddShapeCommand(command, args));
+          return;
+        case commands.CHANGE_ICON_COLOR:
+          changeIconColor(_commands, args);
+          return;
+        case commands.CHANGE_SHAPE:
+          changeShape(_commands, args);
+          return;
+        case commands.CHANGE_SELECTION:
+          changeSelection(_commands, args);
+          return;
+        case commands.REMOVE_OBJECT:
+          _commands = removeObject(_commands, args);
+          return;
+        case commands.LOAD_IMAGE:
+          if (command.args.length !== 4) {
+            return;
+          }
+
+          _commands.push(createCropCommand(command.args[3]));
+      }
+    });
+    return _commands;
   }
 
   /**

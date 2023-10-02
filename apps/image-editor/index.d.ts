@@ -261,6 +261,20 @@ declare namespace tuiImageEditor {
     resizeEditor(dimension: IEditorSize): Promise<void>;
   }
 
+  type AddTextCommand = {
+  }
+
+  type AddIconCommand = {
+  }
+
+  type AddShapeCommand = {
+  }
+
+  type AddLineCommand = {
+  }
+
+  type Command = AddTextCommand | AddIconCommand | AddShapeCommand | AddLineCommand
+
   class ImageEditor {
     constructor(wrapper: string | Element, options: IOptions);
     public ui: UI;
@@ -332,6 +346,8 @@ declare namespace tuiImageEditor {
     public on(eventName: string, handler: (...args: any[]) => void): void;
     public lock(): void;
     public unlock(): void;
+    public dumpCommands(): Command[];
+    public loadCommands(cmds: Command[]): void;
   }
 }
 
