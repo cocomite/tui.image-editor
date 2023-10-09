@@ -599,10 +599,10 @@ class ImageEditor {
   }
 
   /**
-   * Is initialized ?
+   * Wait Initialize
    * @returns {Promise<boolean>}
    */
-  isInitialized() {
+  waitInitialize() {
     return new Promise((resolve) => {
       const interval = setInterval(() => {
         if (!this.ui._initMenuEvent) {
