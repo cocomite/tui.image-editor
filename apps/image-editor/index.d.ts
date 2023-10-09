@@ -330,7 +330,7 @@ declare namespace tuiImageEditor {
       keys: string | string[] | IGraphicObjectProps
     ): IGraphicObjectProps;
     public hasFilter(type: string): boolean;
-    public isInitialized(): Promise<boolean>;
+    public waitInitialize(): Promise<boolean>;
     public isEmptyRedoStack(): boolean;
     public isEmptyUndoStack(): boolean;
     public loadImageFromFile(imgFile: File, imageName?: string): Promise<ICropResolveObject>;
