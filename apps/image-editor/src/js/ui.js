@@ -694,6 +694,13 @@ class Ui {
     this._historyMenu.destroy();
   }
 
+  deselectAll() {
+    if (!this.submenu) {
+      return;
+    }
+    this.changeMenu(this.submenu, true, true);
+  }
+
   /**
    * Init canvas
    * @ignore

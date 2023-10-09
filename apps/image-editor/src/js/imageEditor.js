@@ -599,6 +599,22 @@ class ImageEditor {
   }
 
   /**
+   * Is initialized ?
+   * @returns {Promise<boolean>}
+   */
+  isInitialized() {
+    return new Promise((resolve) => {
+      const interval = setInterval(() => {
+        if (!this.ui._initMenuEvent) {
+          return;
+        }
+        clearInterval(interval);
+        resolve(true);
+      }, 100);
+    });
+  }
+
+  /**
    * Get current drawing mode
    * @returns {string}
    * @example
@@ -879,32 +895,6 @@ class ImageEditor {
     }
 
     return this.loadImageFromURL(data.url, data.imageName, rect);
-  }
-
-  /**
-   * Get cropped rect
-   * @returns {Object | null}  {{left: number, top: number, width: number, height: number}} rect
-   */
-  getCroppedRect() {
-    let rect = null;
-    this._invoker._undoStack.forEach((command) => {
-      if (command.name !== commands.LOAD_IMAGE) {
-        return;
-      }
-
-      if (command.args.length !== 4) {
-        return;
-      }
-
-      rect = rect || { left: 0, top: 0, width: 0, height: 0 };
-      // eslint-disable-next-line prefer-destructuring
-      const rectArg = command.args[3];
-      rect.left += rectArg.left;
-      rect.top += rectArg.top;
-      rect.width = rectArg.width;
-      rect.height = rectArg.height;
-    });
-    return rect;
   }
 
   /**
@@ -1818,28 +1808,6 @@ class ImageEditor {
   }
 
   /**
-   * Load the FabricJS canvas obj to editor
-   * @param {String | Object} json - FabricJS Canvas object
-   * ref: http://fabricjs.com/docs/fabric.Canvas.html#loadFromJSON
-   * @example
-   * imageEditor.loadCanvas({canvasData});
-   */
-  loadCanvas(json) {
-    return this._graphics.loadCanvas(json);
-  }
-
-  /**
-   * Get the full FabricJS canvas obj
-   * @returns {Object} {{canvas}} FabricJS canvas object
-   * @example
-   * var canvasData = imageEditor.getCanvas();
-   * console.log(canvasData);
-   */
-  getCanvas() {
-    return this._graphics.getCanvas();
-  }
-
-  /**
    * Get the canvas size
    * @returns {Object} {{width: number, height: number}} canvas size
    * @example
@@ -1866,6 +1834,9 @@ class ImageEditor {
   }
 
   async loadCommands(cmds) {
+    if (!cmds.length) {
+      return;
+    }
     for (let c of cmds) {
       this.unlock();
       switch (c.name) {
@@ -1900,6 +1871,8 @@ class ImageEditor {
         }
       }
     }
+    this.deactivateAll();
+    this.ui.deselectAll();
   }
 
   dumpCommands() {

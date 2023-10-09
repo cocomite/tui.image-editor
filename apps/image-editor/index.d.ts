@@ -320,10 +320,8 @@ declare namespace tuiImageEditor {
     public discardSelection(): void;
     public flipX(): Promise<IFlipXYResolveObject>;
     public flipY(): Promise<IFlipXYResolveObject>;
-    public getCanvas(): fabric.Canvas
     public getCanvasSize(): ICanvasSize;
     public getCropzoneRect(): IRectConfig;
-    public getCroppedRect(): IRectConfig;
     public getDrawingMode(): string;
     public getImageName(): string;
     public getObjectPosition(id: number, originX: string, originY: string): ICanvasSize;
@@ -331,8 +329,8 @@ declare namespace tuiImageEditor {
       id: number,
       keys: string | string[] | IGraphicObjectProps
     ): IGraphicObjectProps;
-    public loadCanvas(json: string | Object): void
     public hasFilter(type: string): boolean;
+    public isInitialized(): Promise<boolean>;
     public isEmptyRedoStack(): boolean;
     public isEmptyUndoStack(): boolean;
     public loadImageFromFile(imgFile: File, imageName?: string): Promise<ICropResolveObject>;
@@ -357,10 +355,11 @@ declare namespace tuiImageEditor {
     public toDataURL(options?: IToDataURLOptions): string;
     public undo(iterationCount: number): Promise<any>;
     public on(eventName: string, handler: (...args: any[]) => void): void;
+    public once(eventName: string, handler: (...args: any[]) => void): void;
     public lock(): void;
     public unlock(): void;
     public dumpCommands(): Command[];
-    public loadCommands(cmds: Command[]): void;
+    public loadCommands(cmds: Command[]): Promise<void>;
   }
 }
 
