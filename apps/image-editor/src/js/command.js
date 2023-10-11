@@ -1,6 +1,7 @@
 import { commandNames } from '@/consts';
 
 export function createAddTextCommand(command, args) {
+  delete args[1].autofocus;
   return { name: command.name, args: args };
 }
 
