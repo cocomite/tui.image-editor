@@ -1,13 +1,26 @@
 import { commandNames } from '@/consts';
 
-export function createAddTextCommand(command, args) {
+export function createAddTextCommand(command, graphics, args) {
   delete args[1].autofocus;
+  const { angle } = graphics._objects[args[1].id];
+  if (angle) {
+    args[1].styles = { ...args[1].styles, angle };
+  }
   return { name: command.name, args: args };
 }
 
-export function changeTextStyle(commands, args) {
+export function changeTextStyle(commands, graphics, args) {
   commands.forEach((it) => {
-    if (it.name === commandNames.ADD_TEXT && it.args[1].id === args[0]) {
+    if (it.name !== commandNames.ADD_TEXT) {
+      return;
+    }
+    if (it.args[1].id !== args[0]) {
+      return;
+    }
+    const { angle } = graphics._objects[args[0]];
+    if (angle) {
+      it.args[1].styles = { ...it.args[1].styles, ...args[1], angle };
+    } else {
       it.args[1].styles = { ...it.args[1].styles, ...args[1] };
     }
   });
@@ -22,6 +35,7 @@ export function createAddObjectCommand(command, args) {
           args[0].iconType,
           {
             id: args[0].__fe_id,
+            angle: args[0].angle,
             fill: args[0].fill,
             left: args[0].left,
             top: args[0].top,
@@ -39,6 +53,7 @@ export function createAddObjectCommand(command, args) {
           'rect',
           {
             id: args[0].__fe_id,
+            angle: args[0].angle,
             fill: args[0].fill,
             left: args[0].left,
             top: args[0].top,
@@ -59,6 +74,7 @@ export function createAddObjectCommand(command, args) {
           'circle',
           {
             id: args[0].__fe_id,
+            angle: args[0].angle,
             fill: args[0].fill,
             left: args[0].left,
             top: args[0].top,
@@ -81,6 +97,7 @@ export function createAddObjectCommand(command, args) {
           'triangle',
           {
             id: args[0].__fe_id,
+            angle: args[0].angle,
             fill: args[0].fill,
             left: args[0].left,
             top: args[0].top,
@@ -103,6 +120,7 @@ export function createAddObjectCommand(command, args) {
           {
             id: args[0].__fe_id,
             type: args[0].type,
+            angle: args[0].angle,
             fill: args[0].fill,
             left: args[0].left,
             top: args[0].top,
@@ -182,7 +200,7 @@ export function changeShape(commands, args) {
   });
 }
 
-export function changeSelection(commands, args) {
+export function changeSelection(commands, graphics, args) {
   const [[arg]] = args;
   commands.forEach((it) => {
     switch (it.name) {
@@ -199,6 +217,7 @@ export function changeSelection(commands, args) {
         };
         it.args[1].styles = {
           ...it.args[1].styles,
+          angle: graphics._objects[commandId].angle,
           fill: arg.fill,
           fontFamily: arg.fontFamily,
           fontSize: arg.fontSize,
@@ -250,6 +269,9 @@ export function removeObject(commands, args) {
         return it.args[0].id !== id;
       }
       case commandNames.ADD_ICON: {
+        return it.args[1].id !== id;
+      }
+      case commandNames.ADD_SHAPE: {
         return it.args[1].id !== id;
       }
       default:

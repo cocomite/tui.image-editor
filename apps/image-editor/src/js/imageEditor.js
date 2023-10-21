@@ -1876,15 +1876,17 @@ class ImageEditor {
   }
 
   dumpCommands() {
+    this.deactivateAll();
     let _commands = [];
     this._invoker._undoStack.forEach((command) => {
-      let args = command.args.slice(1);
+      const [graphics] = command.args;
+      const args = command.args.slice(1);
       switch (command.name) {
         case commands.ADD_TEXT:
-          _commands.push(createAddTextCommand(command, args));
+          _commands.push(createAddTextCommand(command, graphics, args));
           return;
         case commands.CHANGE_TEXT_STYLE:
-          changeTextStyle(_commands, args);
+          changeTextStyle(_commands, graphics, args);
           return;
         case commands.ADD_OBJECT:
           const c = createAddObjectCommand(command, args);
@@ -1905,7 +1907,7 @@ class ImageEditor {
           changeShape(_commands, args);
           return;
         case commands.CHANGE_SELECTION:
-          changeSelection(_commands, args);
+          changeSelection(_commands, graphics, args);
           return;
         case commands.REMOVE_OBJECT:
           _commands = removeObject(_commands, args);
