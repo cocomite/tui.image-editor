@@ -2,7 +2,10 @@ import { commandNames } from '@/consts';
 
 export function createAddTextCommand(command, graphics, args) {
   delete args[1].autofocus;
-  const { angle } = graphics._objects[args[1].id];
+  let angle = undefined;
+  if (graphics && graphics._objects[args[1].id]) {
+    angle = graphics._objects[args[1].id].angle;
+  }
   if (angle) {
     args[1].styles = { ...args[1].styles, angle };
   }
@@ -17,7 +20,10 @@ export function changeTextStyle(commands, graphics, args) {
     if (it.args[1].id !== args[0]) {
       return;
     }
-    const { angle } = graphics._objects[args[0]];
+    let angle = undefined;
+    if (graphics && graphics._objects[args[0]]) {
+      angle = graphics._objects[args[0]].angle;
+    }
     if (angle) {
       it.args[1].styles = { ...it.args[1].styles, ...args[1], angle };
     } else {
@@ -215,9 +221,13 @@ export function changeSelection(commands, graphics, args) {
           x: arg.left,
           y: arg.top,
         };
+        let angle = undefined;
+        if (graphics && graphics._objects[arg.id]) {
+          angle = graphics._objects[arg.id].angle;
+        }
         it.args[1].styles = {
           ...it.args[1].styles,
-          angle: graphics._objects[commandId].angle,
+          angle: angle,
           fill: arg.fill,
           fontFamily: arg.fontFamily,
           fontSize: arg.fontSize,
