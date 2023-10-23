@@ -28,6 +28,7 @@ const command = {
 
     return shapeComp.add(type, options).then((objectProps) => {
       const { id } = objectProps;
+      this.args[2].id = id;
 
       this.undoData.object = graphics.getObject(id);
 

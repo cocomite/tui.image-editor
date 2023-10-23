@@ -147,6 +147,7 @@ const {
  *  @param {string} [options.selectionStyle.borderColor] - selection border color
  *  @param {number} [options.selectionStyle.rotatingPointOffset] - selection rotating point length
  *  @param {Boolean} [options.usageStatistics=true] - Let us know the hostname. If you don't want to send the hostname, please set to false.
+ *  @param {Boolean} [options.debug] - enable debug log
  * @example
  * var ImageEditor = require('tui-image-editor');
  * var blackTheme = require('./js/theme/black-theme.js');
@@ -179,6 +180,7 @@ class ImageEditor {
       {
         includeUI: false,
         usageStatistics: true,
+        debug: false,
       },
       options
     );
@@ -258,6 +260,8 @@ class ImageEditor {
       this._attachColorPickerInputBoxEvents();
     }
     fabric.enableGLFiltering = false;
+
+    this._debug = options.debug;
   }
 
   _attachColorPickerInputBoxEvents() {
@@ -1879,6 +1883,9 @@ class ImageEditor {
     this.deactivateAll();
     let _commands = [];
     this._invoker._undoStack.forEach((command) => {
+      if (this._debug) {
+        console.log(command);
+      }
       const [graphics] = command.args;
       const args = command.args.slice(1);
       switch (command.name) {
@@ -1920,7 +1927,19 @@ class ImageEditor {
           _commands.push(createCropCommand(command.args[3]));
       }
     });
-    return _commands;
+    return _commands.map((it) => {
+      return {
+        name: it.name,
+        args: it.args.map((arg) => {
+          if (typeof arg === 'object') {
+            delete arg.id;
+            return arg;
+          } else {
+            return arg;
+          }
+        }),
+      };
+    });
   }
 
   /**
