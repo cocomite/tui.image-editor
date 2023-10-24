@@ -1203,6 +1203,7 @@ class ImageEditor {
    */
   addLine(properties) {
     const line = new ArrowLine([properties.x1, properties.y1, properties.x2, properties.y2], {
+      angle: properties.angle,
       stroke: properties.stroke,
       strokeWidth: properties.strokeWidth,
       fill: properties.fill,
@@ -1223,6 +1224,7 @@ class ImageEditor {
       arrowType: { head: null, tail: null },
       evented: false,
     });
+    line.setCoords();
     this._graphics.add(line);
     this._graphics.renderAll();
     line.id = line.__fe_id;
