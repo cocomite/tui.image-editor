@@ -195,9 +195,9 @@ class Text extends Component {
       const canvas = this.getCanvas();
       let newText = null;
       let selectionStyle = fObjectOptions.SELECTION_STYLE;
-      let styles = this._defaultStyles;
+      let styles = { ...this._defaultStyles };
 
-      this._setInitPos(options.position);
+      this._setInitPos(styles, options.position);
 
       if (options.styles) {
         styles = extend(styles, options.styles);
@@ -354,14 +354,15 @@ class Text extends Component {
 
   /**
    * Set initial position on canvas image
+   * @param {Record<string, any>} [styles] - Text style
    * @param {{x: number, y: number}} [position] - Selected position
    * @private
    */
-  _setInitPos(position) {
+  _setInitPos(styles, position) {
     position = position || this.getCanvasImage().getCenterPoint();
 
-    this._defaultStyles.left = position.x;
-    this._defaultStyles.top = position.y;
+    styles.left = position.x;
+    styles.top = position.y;
   }
 
   /**
