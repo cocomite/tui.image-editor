@@ -549,3 +549,18 @@ export function isEmptyCropzone(cropRect) {
 
   return left === LEFT && top === TOP && width === WIDTH && height === HEIGHT;
 }
+
+/**
+ * Omit undefined field.
+ * @param obj object
+ * @returns {object}
+ */
+export function omitUndefined(obj) {
+  const o = { ...obj };
+  Object.keys(o).forEach((it) => {
+    if (o[it] === undefined) {
+      delete o[it];
+    }
+  });
+  return o;
+}

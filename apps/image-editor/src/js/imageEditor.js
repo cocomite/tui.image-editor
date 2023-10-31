@@ -9,7 +9,7 @@ import action from '@/action';
 import commandFactory from '@/factory/command';
 import Graphics from '@/graphics';
 import { makeSelectionUndoData, makeSelectionUndoDatum } from '@/helper/selectionModifyHelper';
-import { sendHostName, getObjectType, stamp } from '@/util';
+import { sendHostName, getObjectType, omitUndefined } from '@/util';
 import {
   eventNames as events,
   commandNames as commands,
@@ -1168,7 +1168,7 @@ class ImageEditor {
    * });
    */
   addShape(type, options) {
-    options = options || {};
+    options = omitUndefined(options || {});
 
     this._setPositions(options);
 
@@ -1202,7 +1202,7 @@ class ImageEditor {
    * @returns {Promise<ObjectProps, ErrorMsg>}
    */
   addLine(properties) {
-    const line = new ArrowLine([properties.x1, properties.y1, properties.x2, properties.y2], {
+    const options = omitUndefined({
       angle: properties.angle,
       stroke: properties.stroke,
       strokeWidth: properties.strokeWidth,
@@ -1224,6 +1224,10 @@ class ImageEditor {
       arrowType: { head: null, tail: null },
       evented: false,
     });
+    const line = new ArrowLine(
+      [properties.x1, properties.y1, properties.x2, properties.y2],
+      options
+    );
     line.setCoords();
     this._graphics.add(line);
     this._graphics.renderAll();
@@ -1305,7 +1309,7 @@ class ImageEditor {
    */
   addText(text, options) {
     text = text || '';
-    options = options || {};
+    options = omitUndefined(options || {});
 
     return this.execute(commands.ADD_TEXT, text, options);
   }
@@ -1548,7 +1552,7 @@ class ImageEditor {
    * });
    */
   addIcon(type, options) {
-    options = options || {};
+    options = omitUndefined(options || {});
 
     this._setPositions(options);
 
