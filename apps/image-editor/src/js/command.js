@@ -1,15 +1,16 @@
 import { commandNames } from '@/consts';
 
 export function createAddTextCommand(command, graphics, args) {
-  delete args[1].autofocus;
+  const a = [args[0], { ...args[1] }];
+  delete a[1].autofocus;
   let angle = undefined;
-  if (graphics && graphics._objects[args[1].id]) {
-    angle = graphics._objects[args[1].id].angle;
+  if (graphics && graphics._objects[a[1].id]) {
+    angle = graphics._objects[a[1].id].angle;
   }
   if (angle) {
-    args[1].styles = { ...args[1].styles, angle };
+    a[1].styles = { ...a[1].styles, angle };
   }
-  return { name: command.name, args: args };
+  return { name: command.name, args: a };
 }
 
 export function changeTextStyle(commands, graphics, args) {
@@ -17,7 +18,8 @@ export function changeTextStyle(commands, graphics, args) {
     if (it.name !== commandNames.ADD_TEXT) {
       return;
     }
-    if (it.args[1].id !== args[0]) {
+    const a = { ...it.args[1] };
+    if (a.id !== args[0]) {
       return;
     }
     let angle = undefined;
@@ -25,10 +27,11 @@ export function changeTextStyle(commands, graphics, args) {
       angle = graphics._objects[args[0]].angle;
     }
     if (angle) {
-      it.args[1].styles = { ...it.args[1].styles, ...args[1], angle };
+      a.styles = { ...a.styles, ...args[1], angle };
     } else {
-      it.args[1].styles = { ...it.args[1].styles, ...args[1] };
+      a.styles = { ...a.styles, ...args[1] };
     }
+    it.args[1] = a;
   });
 }
 
@@ -157,22 +160,26 @@ export function createAddObjectCommand(command, args) {
 }
 
 export function createAddIconCommand(command, args) {
-  return { name: command.name, args: args };
+  return { name: command.name, args: [args[0], { ...args[1] }] };
 }
 
 export function changeIconColor(commands, args) {
   commands.forEach((it) => {
     switch (it.name) {
       case commandNames.ADD_OBJECT: {
-        if (it.args[0].id === args[0]) {
-          it.args[0].fill = args[1];
+        const a = { ...it.args[0] };
+        if (a.id === args[0]) {
+          a.fill = args[1];
         }
+        it.args[0] = a;
         break;
       }
       case commandNames.ADD_ICON: {
-        if (it.args[1].id === args[0]) {
-          it.args[1].fill = args[1];
+        const a = { ...it.args[1] };
+        if (a.id === args[0]) {
+          a.fill = args[1];
         }
+        it.args[1] = a;
         break;
       }
     }
@@ -180,26 +187,30 @@ export function changeIconColor(commands, args) {
 }
 
 export function createAddShapeCommand(command, args) {
-  return { name: command.name, args: args };
+  return { name: command.name, args: [args[0], { ...args[1] }] };
 }
 
 export function changeShape(commands, args) {
   commands.forEach((it) => {
     switch (it.name) {
       case commandNames.ADD_OBJECT: {
-        if (it.args[0].id === args[0]) {
+        const a = { ...it.args[0] };
+        if (a.id === args[0]) {
           Object.keys(args[1]).forEach((key) => {
-            it.args[0][key] = args[1][key];
+            a[key] = args[1][key];
           });
         }
+        it.args[0] = a;
         break;
       }
       case commandNames.ADD_SHAPE: {
-        if (it.args[1].id === args[0]) {
+        const a = { ...it.args[1] };
+        if (a.id === args[0]) {
           Object.keys(args[1]).forEach((key) => {
-            it.args[1][key] = args[1][key];
+            a[key] = args[1][key];
           });
         }
+        it.args[1] = a;
         break;
       }
     }
@@ -216,25 +227,27 @@ export function changeSelection(commands, graphics, args) {
         if (commandId !== argId) {
           return;
         }
-        it.args[0] = arg.text;
-        it.args[1].position = {
-          x: arg.left,
-          y: arg.top,
+        const a = [it.args[0], { ...it.args[1] }];
+        a[0] = arg.text;
+        a[1] = {
+          ...a[1],
+          position: {
+            x: arg.left,
+            y: arg.top,
+          },
+          styles: {
+            ...a[1].styles,
+            angle:
+              graphics && graphics._objects[arg.id] ? graphics._objects[arg.id].angle : undefined,
+            fill: arg.fill,
+            fontFamily: arg.fontFamily,
+            fontSize: arg.fontSize,
+            fontStyle: arg.fontStyle,
+            fontWeight: arg.fontWeight,
+            underline: arg.underline,
+          },
         };
-        let angle = undefined;
-        if (graphics && graphics._objects[arg.id]) {
-          angle = graphics._objects[arg.id].angle;
-        }
-        it.args[1].styles = {
-          ...it.args[1].styles,
-          angle: angle,
-          fill: arg.fill,
-          fontFamily: arg.fontFamily,
-          fontSize: arg.fontSize,
-          fontStyle: arg.fontStyle,
-          fontWeight: arg.fontWeight,
-          underline: arg.underline,
-        };
+        it.args = a;
         return;
       }
       case commandNames.ADD_ICON:
@@ -244,11 +257,13 @@ export function changeSelection(commands, graphics, args) {
         if (commandId !== argId) {
           return;
         }
-        Object.keys(it.args[1])
+        const a = { ...it.args[1] };
+        Object.keys(a)
           .filter((key) => !['id'].includes(key))
           .forEach((key) => {
-            it.args[1][key] = arg[key];
+            a[key] = arg[key];
           });
+        it.args[1] = a;
         return;
       }
       case commandNames.ADD_OBJECT: {
@@ -257,11 +272,13 @@ export function changeSelection(commands, graphics, args) {
         if (commandId !== argId) {
           return;
         }
-        Object.keys(it.args[0])
+        const a = { ...it.args[0] };
+        Object.keys(a)
           .filter((key) => !['id', 'type'].includes(key))
           .forEach((key) => {
-            it.args[0][key] = arg[key];
+            a[key] = arg[key];
           });
+        it.args[0] = a;
         return;
       }
     }
@@ -291,5 +308,5 @@ export function removeObject(commands, args) {
 }
 
 export function createCropCommand(args) {
-  return { name: commandNames.CROP, args: args };
+  return { name: commandNames.CROP, args: { ...args } };
 }
