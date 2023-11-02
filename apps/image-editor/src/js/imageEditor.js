@@ -1893,7 +1893,7 @@ class ImageEditor {
         console.log(command);
       }
       const [graphics] = command.args;
-      const args = command.args.slice(1);
+      const args = [...command.args.slice(1)];
       switch (command.name) {
         case commands.ADD_TEXT:
           _commands.push(createAddTextCommand(command, graphics, args));
@@ -1936,14 +1936,17 @@ class ImageEditor {
     return _commands.map((it) => {
       return {
         name: it.name,
-        args: it.args.map((arg) => {
-          if (typeof arg === 'object') {
-            delete arg.id;
-            return arg;
-          } else {
-            return arg;
-          }
-        }),
+        args:
+          it.args instanceof Array
+            ? it.args.map((arg) => {
+                if (typeof arg === 'object') {
+                  delete arg.id;
+                  return arg;
+                } else {
+                  return arg;
+                }
+              })
+            : it.args,
       };
     });
   }
