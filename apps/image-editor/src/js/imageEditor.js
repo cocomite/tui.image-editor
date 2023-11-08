@@ -1171,6 +1171,7 @@ class ImageEditor {
     options = omitUndefined(options || {});
 
     this._setPositions(options);
+    this._setUniqueParameter(options, type);
 
     return this.execute(commands.ADD_SHAPE, type, options);
   }
@@ -1555,6 +1556,7 @@ class ImageEditor {
     options = omitUndefined(options || {});
 
     this._setPositions(options);
+    options.iconType = type;
 
     return this.execute(commands.ADD_ICON, type, options);
   }
@@ -1750,6 +1752,16 @@ class ImageEditor {
     if (isUndefined(options.top)) {
       options.top = centerPosition.top;
     }
+  }
+
+  /**
+   * Set position
+   * @param {Object} options - Position options (left or top)
+   * @param {string} type - Shape type
+   * @private
+   */
+  _setUniqueParameter(options, type) {
+    options.iconType = type.iconType;
   }
 
   /**
