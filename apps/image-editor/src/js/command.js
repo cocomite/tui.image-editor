@@ -257,7 +257,15 @@ export function changeSelection(commands, graphics, args) {
         if (commandId !== argId) {
           return;
         }
-        it.args[1] = { ...it.args[1], ...arg, id: it.args[1].id };
+        const a = { ...it.args[1] };
+        Object.keys(a)
+          .filter((key) => !['id'].includes(key))
+          .forEach((key) => {
+            if (arg[key]) {
+              a[key] = arg[key];
+            }
+          });
+        it.args[1] = a;
         return;
       }
       case commandNames.ADD_OBJECT: {
