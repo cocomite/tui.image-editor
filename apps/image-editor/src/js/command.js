@@ -218,72 +218,73 @@ export function changeShape(commands, args) {
 }
 
 export function changeSelection(commands, graphics, args) {
-  const [[arg]] = args;
-  commands.forEach((it) => {
-    switch (it.name) {
-      case commandNames.ADD_TEXT: {
-        const commandId = +it.args[1].id;
-        const argId = +arg.id;
-        if (commandId !== argId) {
+  args[0].forEach((arg) => {
+    commands.forEach((it, i) => {
+      switch (it.name) {
+        case commandNames.ADD_TEXT: {
+          const commandId = +it.args[1].id;
+          const argId = +arg.id;
+          if (commandId !== argId) {
+            return;
+          }
+          const a = [it.args[0], { ...it.args[1] }];
+          a[0] = arg.text;
+          a[1] = {
+            ...a[1],
+            position: {
+              x: arg.left,
+              y: arg.top,
+            },
+            styles: {
+              ...a[1].styles,
+              angle:
+                graphics && graphics._objects[arg.id] ? graphics._objects[arg.id].angle : undefined,
+              fill: arg.fill,
+              fontFamily: arg.fontFamily,
+              fontSize: arg.fontSize,
+              fontStyle: arg.fontStyle,
+              fontWeight: arg.fontWeight,
+              underline: arg.underline,
+            },
+          };
+          it.args = a;
           return;
         }
-        const a = [it.args[0], { ...it.args[1] }];
-        a[0] = arg.text;
-        a[1] = {
-          ...a[1],
-          position: {
-            x: arg.left,
-            y: arg.top,
-          },
-          styles: {
-            ...a[1].styles,
-            angle:
-              graphics && graphics._objects[arg.id] ? graphics._objects[arg.id].angle : undefined,
-            fill: arg.fill,
-            fontFamily: arg.fontFamily,
-            fontSize: arg.fontSize,
-            fontStyle: arg.fontStyle,
-            fontWeight: arg.fontWeight,
-            underline: arg.underline,
-          },
-        };
-        it.args = a;
-        return;
-      }
-      case commandNames.ADD_ICON:
-      case commandNames.ADD_SHAPE: {
-        const commandId = +it.args[1].id;
-        const argId = +arg.id;
-        if (commandId !== argId) {
+        case commandNames.ADD_ICON:
+        case commandNames.ADD_SHAPE: {
+          const commandId = +it.args[1].id;
+          const argId = +arg.id;
+          if (commandId !== argId) {
+            return;
+          }
+          const a = { ...it.args[1] };
+          Object.keys(a)
+            .filter((key) => !['id'].includes(key))
+            .forEach((key) => {
+              if (arg[key]) {
+                a[key] = arg[key];
+              }
+            });
+          it.args[1] = a;
           return;
         }
-        const a = { ...it.args[1] };
-        Object.keys(a)
-          .filter((key) => !['id'].includes(key))
-          .forEach((key) => {
-            if (arg[key]) {
+        case commandNames.ADD_OBJECT: {
+          const commandId = +it.args[0].id;
+          const argId = +arg.id;
+          if (commandId !== argId) {
+            return;
+          }
+          const a = { ...it.args[0] };
+          Object.keys(a)
+            .filter((key) => !['id', 'type'].includes(key))
+            .forEach((key) => {
               a[key] = arg[key];
-            }
-          });
-        it.args[1] = a;
-        return;
-      }
-      case commandNames.ADD_OBJECT: {
-        const commandId = +it.args[0].id;
-        const argId = +arg.id;
-        if (commandId !== argId) {
+            });
+          it.args[0] = a;
           return;
         }
-        const a = { ...it.args[0] };
-        Object.keys(a)
-          .filter((key) => !['id', 'type'].includes(key))
-          .forEach((key) => {
-            a[key] = arg[key];
-          });
-        it.args[0] = a;
-        return;
       }
-    }
+    });
   });
 }
 
