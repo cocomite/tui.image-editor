@@ -154,6 +154,24 @@ export function createAddObjectCommand(command, args) {
           },
         ],
       };
+    case 'text':
+      return {
+        name: commandNames.ADD_ICON,
+        args: [
+          args[0].iconType,
+          {
+            id: args[0].__fe_id,
+            angle: args[0].angle,
+            fill: args[0].fill,
+            left: args[0].left,
+            top: args[0].top,
+            width: args[0].width,
+            height: args[0].height,
+            scaleX: args[0].scaleX,
+            scaleY: args[0].scaleY,
+          },
+        ],
+      };
     default:
       return null;
   }
