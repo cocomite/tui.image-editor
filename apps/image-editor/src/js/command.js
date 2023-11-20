@@ -176,7 +176,7 @@ export function createAddObjectCommand(command, args) {
             id: args[0].__fe_id,
             position: position,
             styles: styles,
-            isPaste: args[0].isPaste,
+            isCloned: args[0].isCloned,
           },
         ],
       };
@@ -256,7 +256,7 @@ export function changeSelection(commands, graphics, args) {
           let { left } = arg;
           let { top } = arg;
           // コピペして移動した場合のみ、位置がズレるので調整する
-          if (it.args[1].isPaste) {
+          if (it.args[1].isCloned) {
             left -= arg.width / 2;
             top -= arg.height / 2;
           }

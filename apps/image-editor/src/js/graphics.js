@@ -1497,10 +1497,9 @@ class Graphics {
   _copyFabricObject(targetObject) {
     return new Promise((resolve) => {
       targetObject.clone((cloned) => {
+        cloned.originId = targetObject.id;
         cloned.iconType = targetObject.iconType;
-        if (targetObject.text) {
-          cloned.isPaste = true;
-        }
+        cloned.isCloned = true;
         const shapeComp = this.getComponent(components.SHAPE);
         if (isShape(cloned)) {
           shapeComp.processForCopiedObject(cloned, targetObject);
