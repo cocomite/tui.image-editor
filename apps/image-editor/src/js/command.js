@@ -154,6 +154,32 @@ export function createAddObjectCommand(command, args) {
           },
         ],
       };
+    case 'i-text':
+      const position = {
+        x: args[0].left,
+        y: args[0].top,
+      };
+      const styles = {
+        angle: args[0].angle,
+        fill: args[0].fill,
+        fontFamily: args[0].fontFamily,
+        fontSize: args[0].fontSize,
+        fontStyle: args[0].fontStyle,
+        fontWeight: args[0].fontWeight,
+        underline: args[0].underline,
+      };
+      return {
+        name: commandNames.ADD_TEXT,
+        args: [
+          args[0].text,
+          {
+            id: args[0].__fe_id,
+            position: position,
+            styles: styles,
+            isCloned: args[0].isCloned,
+          },
+        ],
+      };
     default:
       return null;
   }
@@ -227,13 +253,20 @@ export function changeSelection(commands, graphics, args) {
           if (commandId !== argId) {
             return;
           }
+          let { left } = arg;
+          let { top } = arg;
+          // コピペして移動した場合のみ、位置がズレるので調整する
+          if (it.args[1].isCloned) {
+            left -= arg.width / 2;
+            top -= arg.height / 2;
+          }
           const a = [it.args[0], { ...it.args[1] }];
           a[0] = arg.text;
           a[1] = {
             ...a[1],
             position: {
-              x: arg.left,
-              y: arg.top,
+              x: left,
+              y: top,
             },
             styles: {
               ...a[1].styles,

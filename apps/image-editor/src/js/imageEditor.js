@@ -1953,6 +1953,7 @@ class ImageEditor {
             ? it.args.map((arg) => {
                 if (typeof arg === 'object') {
                   delete arg.id;
+                  delete arg.isCloned;
                   return arg;
                 } else {
                   return arg;
