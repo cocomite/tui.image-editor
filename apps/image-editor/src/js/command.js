@@ -261,7 +261,9 @@ export function changeSelection(commands, graphics, args) {
             top -= arg.height / 2;
           }
           const a = [it.args[0], { ...it.args[1] }];
-          a[0] = arg.text;
+          if (arg.text) {
+            a[0] = arg.text;
+          }
           a[1] = {
             ...a[1],
             position: {
@@ -311,7 +313,9 @@ export function changeSelection(commands, graphics, args) {
           Object.keys(a)
             .filter((key) => !['id', 'type'].includes(key))
             .forEach((key) => {
-              a[key] = arg[key];
+              if (arg[key]) {
+                a[key] = arg[key];
+              }
             });
           it.args[0] = a;
           return;
