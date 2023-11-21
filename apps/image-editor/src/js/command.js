@@ -313,7 +313,9 @@ export function changeSelection(commands, graphics, args) {
           Object.keys(a)
             .filter((key) => !['id', 'type'].includes(key))
             .forEach((key) => {
-              a[key] = arg[key];
+              if (arg[key]) {
+                a[key] = arg[key];
+              }
             });
           it.args[0] = a;
           return;
