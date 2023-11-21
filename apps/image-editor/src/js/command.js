@@ -261,7 +261,9 @@ export function changeSelection(commands, graphics, args) {
             top -= arg.height / 2;
           }
           const a = [it.args[0], { ...it.args[1] }];
-          a[0] = arg.text;
+          if (arg.text) {
+            a[0] = arg.text;
+          }
           a[1] = {
             ...a[1],
             position: {
