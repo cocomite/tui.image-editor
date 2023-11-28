@@ -268,7 +268,7 @@ export function changeSelection(commands, graphics, args) {
           const style = { ...a[1].styles };
           style.angle =
             graphics && graphics._objects[arg.id] ? graphics._objects[arg.id].angle : undefined;
-          styleProps.map((key) => {
+          styleProps.forEach((key) => {
             if (arg[key]) {
               style[key] = arg[key];
             }
