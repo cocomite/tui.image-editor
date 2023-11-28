@@ -155,10 +155,7 @@ export function createAddObjectCommand(command, args) {
         ],
       };
     case 'i-text':
-      const position = {
-        x: args[0].left,
-        y: args[0].top,
-      };
+      const position = _getAdjustedTextPosition(args[0], false);
       const styles = {
         angle: args[0].angle,
         fill: args[0].fill,
@@ -253,34 +250,33 @@ export function changeSelection(commands, graphics, args) {
           if (commandId !== argId) {
             return;
           }
-          let { left } = arg;
-          let { top } = arg;
-          // コピペして移動した場合のみ、位置がズレるので調整する
-          if (it.args[1].isCloned) {
-            left -= arg.width / 2;
-            top -= arg.height / 2;
-          }
           const a = [it.args[0], { ...it.args[1] }];
           if (arg.text) {
             a[0] = arg.text;
           }
+
+          const isMultiSelection = args[0].length > 1;
+          const position = _getAdjustedTextPosition(arg, it.args[1].isCloned, isMultiSelection);
+          const styleProps = [
+            'fill',
+            'fontFamily',
+            'fontSize',
+            'fontStyle',
+            'fontWeight',
+            'underline',
+          ];
+          const style = { ...a[1].styles };
+          style.angle =
+            graphics && graphics._objects[arg.id] ? graphics._objects[arg.id].angle : undefined;
+          styleProps.forEach((key) => {
+            if (arg[key]) {
+              style[key] = arg[key];
+            }
+          });
           a[1] = {
             ...a[1],
-            position: {
-              x: left,
-              y: top,
-            },
-            styles: {
-              ...a[1].styles,
-              angle:
-                graphics && graphics._objects[arg.id] ? graphics._objects[arg.id].angle : undefined,
-              fill: arg.fill,
-              fontFamily: arg.fontFamily,
-              fontSize: arg.fontSize,
-              fontStyle: arg.fontStyle,
-              fontWeight: arg.fontWeight,
-              underline: arg.underline,
-            },
+            position: position,
+            styles: style,
           };
           it.args = a;
           return;
@@ -349,4 +345,20 @@ export function removeObject(commands, args) {
 
 export function createCropCommand(args) {
   return { name: commandNames.CROP, args: { ...args } };
+}
+
+function _getAdjustedTextPosition(args, isCloned, isMultiSelection = false) {
+  const position = {
+    x: args.left,
+    y: args.top,
+  };
+  // Note: 位置ズレする条件
+  // 1. コピペされたオブジェクトかつ単一選択されたオブジェクト
+  // 2. 複数コピペした後アクティブ状態を解除せずに移動したオブジェクト(未対応)
+  if (isCloned && !isMultiSelection) {
+    position.x = args.left - args.width / 2;
+    position.y = args.top - args.height / 2;
+    return position;
+  }
+  return position;
 }
